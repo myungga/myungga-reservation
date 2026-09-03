@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Myungga Korean Restaurant · 명가 한식당 예약 관리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#F0F2F5;--bg2:#E4E8EE;--bg3:#D0D5DE;--card:#FFFFFF;--border:#B0B8C8;--border2:#8A96AA;
+  --text:#0A0E17;--text2:#2A3245;--text3:#4A5570;
+  --green:#0D5C3A;--green-bg:#D4EDDF;--green-light:#A8DBC0;
+  --amber:#7A4800;--amber-bg:#FAECC8;
+  --red:#8A1A0A;--red-bg:#FAD8D4;
+  --blue:#0A3070;--blue-bg:#D4E4FA;--blue-light:#A8C8F0;
+  --radius:8px;--radius-sm:5px;
+  --shadow:0 1px 4px rgba(0,0,0,0.12),0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg:0 4px 24px rgba(0,0,0,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#E8ECF2;color:var(--text);min-height:100vh;font-size:14px}
+a{text-decoration:none}
+.app{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#0A0E17;border-bottom:1px solid #1A2235;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-lg)}
+.topbar-logo{display:flex;align-items:center;gap:10px}
+.topbar-logo .logo-icon{width:34px;height:34px;background:#FFFFFF;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:#0A0E17;font-size:18px}
+.topbar-logo .logo-text{font-size:15px;font-weight:600;letter-spacing:-0.3px;color:#FFFFFF}
+.topbar-logo .logo-sub{font-size:11px;color:#8A96AA;margin-top:1px}
+.topbar-nav{display:flex;gap:2px}
+.nav-btn{padding:6px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:#8A96AA;display:flex;align-items:center;gap:6px;transition:all 0.15s}
+.nav-btn:hover{background:#1A2235;color:#FFFFFF}
+.nav-btn.active{background:#FFFFFF;color:#0A0E17}
+.main{flex:1;padding:24px;max-width:960px;margin:0 auto;width:100%}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px}
+.btn{padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--text);display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;white-space:nowrap}
+.btn:hover{background:var(--bg3);border-color:var(--border2)}
+.btn.primary{background:var(--text);color:#fff;border-color:var(--text)}
+.btn.primary:hover{background:#2A2420;border-color:#2A2420}
+.btn.success{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.success:hover{background:#155A3A}
+.btn.ghost{border:none;background:none;padding:5px 8px;color:var(--text3)}
+.btn.ghost:hover{background:var(--bg2);color:var(--text)}
+.btn.danger-ghost{border:none;background:none;padding:5px 8px;color:var(--red)}
+.btn.danger-ghost:hover{background:var(--red-bg)}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.page{display:none}.page.active{display:block}
+.page-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.page-back{cursor:pointer;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:4px;background:none;border:none;padding:0;transition:color 0.15s}
+.page-back:hover{color:var(--text)}
+.page-title{font-size:20px;font-weight:600;flex:1;letter-spacing:-0.3px}
+.page-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.metric{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center}
+.metric-label{font-size:11px;color:var(--text3);margin-bottom:4px;line-height:1.3}
+.metric-value{font-size:22px;font-weight:700;letter-spacing:-0.5px;color:var(--text)}
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.month-label{text-align:center}
+.month-label .ml-main{font-size:18px;font-weight:600;letter-spacing:-0.3px}
+.month-label .ml-sub{font-size:11px;color:var(--text3)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-hdr{text-align:center;font-size:11px;color:var(--text3);padding:4px 0;font-weight:500}
+.cal-cell{border-radius:var(--radius-sm);padding:7px 4px;text-align:center;cursor:pointer;border:1px solid transparent;min-height:62px;transition:all 0.15s;position:relative}
+.cal-cell:hover{background:var(--bg2);border-color:var(--border)}
+.cal-cell.empty{pointer-events:none;opacity:0}
+.cal-cell.today{border-color:var(--text);background:var(--bg2)}
+.cal-cell.today .day-num{font-weight:700}
+.day-num{font-size:13px;font-weight:600;color:var(--text)}
+.day-dots{display:flex;gap:4px;justify-content:center;margin-top:5px}
+.day-dot{width:8px;height:8px;border-radius:2px}
+.dot-ok{background:#1D9E75}.dot-warn{background:#D4920A}.dot-full{background:#C0392B}.dot-empty{background:var(--bg3)}
+.day-pax{font-size:10px;color:var(--text3);margin-top:3px;font-family:'DM Mono',monospace}
+.cal-legend{display:flex;gap:14px;justify-content:flex-end;margin-top:10px;font-size:11px;color:var(--text3);flex-wrap:wrap}
+.cal-legend span{display:flex;align-items:center;gap:5px}
+.legend-dot{width:8px;height:8px;border-radius:2px;display:inline-block}
+.cap-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}
+.cap-block{border-radius:var(--radius-sm);padding:12px 14px}
+.cap-block.lb{background:var(--amber-bg);border:1px solid #EDD898}
+.cap-block.db{background:var(--blue-bg);border:1px solid var(--blue-light)}
+.cap-title{font-size:11px;font-weight:600;margin-bottom:7px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:0.4px}
+.cap-title.lt{color:var(--amber)}.cap-title.dt{color:var(--blue)}
+.cap-bar{height:7px;background:rgba(0,0,0,0.08);border-radius:4px;overflow:hidden}
+.cap-fill{height:100%;border-radius:4px;transition:width 0.4s ease}
+.cap-txt{font-size:11px;margin-top:5px;text-align:right;font-family:'DM Mono',monospace}
+.cap-txt.lt{color:var(--amber)}.cap-txt.dt{color:var(--blue)}
+.sec-div{display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.sec-div-label{font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px}
+.time-slot{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;overflow:hidden;transition:box-shadow 0.15s}
+.time-slot:hover{box-shadow:var(--shadow)}
+.ts-header{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;transition:background 0.15s;user-select:none}
+.ts-header:hover{background:var(--bg)}
+.ts-time{font-size:15px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)}
+.ts-right{display:flex;align-items:center;gap:8px}
+.badge{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:500}
+.badge-lunch{background:var(--amber-bg);color:var(--amber)}
+.badge-dinner{background:var(--blue-bg);color:var(--blue)}
+.badge-count{background:var(--bg2);color:var(--text2);font-family:'DM Mono',monospace}
+.badge-add{background:var(--green-bg);color:var(--green);border:none;cursor:pointer;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;display:inline-flex;align-items:center;gap:4px;transition:all 0.15s}
+.badge-add:hover{background:var(--green-light)}
+.slot-list{display:none;border-top:1px solid var(--border)}
+.slot-list.open{display:block}
+.res-row{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bg2)}
+.res-row:last-child{border-bottom:none}
+.res-row:hover{background:var(--bg)}
+.res-type{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap;margin-top:2px;text-transform:uppercase;letter-spacing:0.3px}
+.rt-tour{background:var(--blue-bg);color:var(--blue)}
+.rt-walkin{background:var(--green-bg);color:var(--green)}
+.res-info{flex:1;min-width:0}
+.res-name{font-size:13px;font-weight:700;color:var(--text)}
+.res-detail{font-size:12px;color:var(--text3);margin-top:2px;line-height:1.5}
+.res-pax{font-size:14px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text2);white-space:nowrap}
+.empty-slot{padding:12px 16px;font-size:12px;color:var(--text3);font-style:italic}
+.empty-slot a{color:var(--green);cursor:pointer;font-style:normal;font-weight:500}
+.type-toggle{display:flex;gap:8px;margin-bottom:18px}
+.type-btn{flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;background:var(--bg2);color:var(--text2);text-align:center;line-height:1.4;transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.type-btn:hover{background:var(--bg3)}
+.type-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.type-btn sub{font-size:10px;display:block;opacity:0.7;margin-top:1px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-grid.single{grid-template-columns:1fr}
+.form-field label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px}
+.form-field label .lbl-kr{font-size:10px;color:var(--text3);font-weight:400;margin-left:4px}
+input[type=text],input[type=number],select,textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;transition:border-color 0.15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--text2)}
+textarea{resize:vertical;min-height:56px}
+.form-sec-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--bg2)}
+.form-sec-lbl.no-top{border-top:none;margin-top:0;padding-top:0}
+.ac-wrap{position:relative}
+.ac-row{display:flex;gap:6px}
+.ac-row input,.ac-row textarea{flex:1}
+.ac-btn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 10px;cursor:pointer;color:var(--text3);font-size:12px;display:flex;align-items:center;transition:all 0.15s;white-space:nowrap}
+.ac-btn:hover{background:var(--bg3);color:var(--text)}
+.ac-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:300;max-height:190px;overflow-y:auto;display:none}
+.ac-dropdown.open{display:block}
+.ac-item{padding:9px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background 0.1s}
+.ac-item:hover{background:var(--bg)}
+.ac-del{color:var(--text3);font-size:11px;padding:2px 6px;border-radius:var(--radius-sm);border:none;background:none;cursor:pointer;opacity:0.5;line-height:1}
+.ac-del:hover{opacity:1;color:var(--red);background:var(--red-bg)}
+.ac-empty{padding:10px 12px;font-size:12px;color:var(--text3);font-style:italic}
+.ac-hint{font-size:11px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:4px}
+.edit-banner{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-light);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;margin-bottom:14px;display:none;align-items:center;gap:8px}
+.warn-bar{border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;margin-bottom:14px;display:none}
+.warn-bar.over{background:var(--red-bg);color:var(--red);border:1px solid #F0B8B0}
+.warn-bar.caution{background:var(--amber-bg);color:var(--amber);border:1px solid #EDD898}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:11px 22px;border-radius:var(--radius);font-size:13px;font-weight:500;display:none;z-index:999;box-shadow:var(--shadow-lg);letter-spacing:0.1px}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body *{visibility:hidden!important}
+  #print-area,#print-area *{visibility:visible!important}
+  .topbar,.topbar-nav,.no-print{display:none!important}
+  body{background:#fff;margin:0;padding:0;height:auto}
+  #print-area{display:block!important;position:absolute;top:0;left:0;width:100%;padding:8mm 10mm;font-family:Arial,sans-serif;font-size:11px;color:#000;box-sizing:border-box;background:#fff;page-break-after:avoid}
+  @page{size:A4 landscape;margin:0}
+  .ph{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:8px}
+  .ph-left h1{font-size:15px;font-weight:bold;margin:0}
+  .ph-left p{font-size:10px;color:#555;margin:2px 0 0}
+  .ph-date{font-size:14px;font-weight:bold;text-align:right}
+  .ph-date span{font-size:10px;color:#555;display:block;font-weight:normal}
+  .ps{display:flex;gap:0;border:1px solid #ccc;border-radius:3px;overflow:hidden;margin-bottom:8px}
+  .ps-item{flex:1;padding:5px 8px;border-right:1px solid #ccc;text-align:center}
+  .ps-item:last-child{border-right:none}
+  .ps-item .ps-lbl{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:0.3px}
+  .ps-item .ps-val{font-size:14px;font-weight:bold;line-height:1.2}
+  .ps-item.lunch{background:#FFFBF0}.ps-item.dinner{background:#F5F0FF}.ps-item.total{background:#F0F0F0}
+  .pt-title{font-size:11px;font-weight:bold;background:#333;color:#fff;padding:4px 10px;margin-bottom:0;display:flex;align-items:center;justify-content:space-between}
+  .pt-title span{font-weight:normal;font-size:10px;opacity:0.8}
+  table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px;table-layout:fixed}
+  col.col-num{width:4%}col.col-time{width:8%}col.col-type{width:8%}col.col-name{width:18%}col.col-guide{width:14%}col.col-pax{width:6%}col.col-menu{width:42%}
+  th{background:#f0f0f0;border:1px solid #bbb;padding:4px 6px;text-align:left;font-size:10px;font-weight:bold;white-space:nowrap;overflow:hidden}
+  td{border:1px solid #ccc;padding:4px 6px;vertical-align:middle;line-height:1.4;overflow:hidden;word-break:break-word}
+  tr.tr-tour td{background:#EEF4FF}tr.tr-walkin td{background:#EEF9F4}
+  td.td-pax{text-align:center;font-weight:bold;font-size:12px}
+  td.td-time{font-weight:bold;white-space:nowrap;font-size:11px}
+  td.td-num{text-align:center;color:#888;font-size:10px}
+  .pf{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #ccc;padding-top:5px;font-size:9px;color:#888;margin-top:5px}
+  .p-legend{display:flex;gap:10px}
+  .p-legend span{display:flex;align-items:center;gap:4px}
+  .p-dot{width:10px;height:10px;border-radius:1px;display:inline-block;border:1px solid #ccc}
+}
+#print-area{display:none}
+@media(max-width:640px){
+  .metric-grid{grid-template-columns:repeat(2,1fr)}
+  .cap-row{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .main{padding:16px}.topbar{padding:0 16px}
+  .btn-row{flex-direction:column}
+  .btn-row .btn{justify-content:center}
+}
+</style>
+</head>
+<body>
+<div id="loading-overlay" style="display:flex;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(232,236,242,0.9);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+  <div style="width:36px;height:36px;border:3px solid #D8D2C8;border-top-color:#1A1714;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+  <p style="font-size:13px;color:#5A5248;font-family:'DM Sans',sans-serif">Loading · 불러오는 중...</p>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+<div class="app">
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon"><i class="ti ti-building-store"></i></div>
+    <div>
+      <div class="logo-text">Myungga Korean Restaurant</div>
+      <div class="logo-sub">명가 한식당 · 예약 관리 시스템</div>
+    </div>
+  </div>
+  <div class="topbar-nav no-print">
+    <button class="nav-btn active" id="nav-today" onclick="showTab('today')"><i class="ti ti-home"></i> Today · 오늘</button>
+    <button class="nav-btn" id="nav-monthly" onclick="showTab('monthly')"><i class="ti ti-calendar-month"></i> Monthly · 월별</button>
+    <button class="nav-btn" id="nav-daily" onclick="showTab('daily')"><i class="ti ti-calendar-day"></i> Daily · 일별</button>
+    <button class="nav-btn" id="nav-input" onclick="showTab('input')"><i class="ti ti-plus"></i> New · 신규</button>
+  </div>
+</div>
+<div class="main">
+<div id="print-area"></div>
+<div class="toast" id="toast"></div>
+<!-- PAGE: Today -->
+<div class="page active" id="page-today">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div>
+      <div style="font-size:20px;font-weight:700;letter-spacing:-0.3px" id="today-title"></div>
+      <div style="font-size:12px;color:var(--text3);margin-top:2px">오늘의 예약 현황 · Today's Reservations</div>
+    </div>
+    <button class="btn no-print" onclick="selectedDate=todayStr();showTab('daily')"><i class="ti ti-edit"></i> 예약 관리</button>
+  </div>
+
+  <!-- 요약 카드 -->
+  <div class="metric-grid" id="today-metrics"></div>
+
+  <!-- 용량 바 -->
+  <div class="card" style="padding:16px 20px">
+    <div class="cap-row">
+      <div class="cap-block lb">
+        <div class="cap-title lt"><i class="ti ti-sun" style="font-size:12px"></i> Lunch · 점심 (max 200)</div>
+        <div class="cap-bar"><div class="cap-fill" id="today-lunch-fill" style="width:0%"></div></div>
+        <div class="cap-txt lt" id="today-lunch-txt"></div>
+      </div>
+      <div class="cap-block db">
+        <div class="cap-title dt"><i class="ti ti-moon" style="font-size:12px"></i> Dinner · 저녁 (max 200)</div>
+        <div class="cap-bar"><div class="cap-fill" id="today-dinner-fill" style="width:0%"></div></div>
+        <div class="cap-txt dt" id="today-dinner-txt"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 점심 슬롯 -->
+  <div class="sec-div">
+    <div class="sec-div-label"><i class="ti ti-sun"></i> Lunch · 점심 &nbsp;11:00–14:00</div>
+    <button class="btn ghost" onclick="toggleAllToday('lunch')"><i class="ti ti-list"></i> All · 전체</button>
+  </div>
+  <div id="today-slots-lunch"></div>
+
+  <!-- 저녁 슬롯 -->
+  <div class="sec-div" style="margin-top:20px">
+    <div class="sec-div-label"><i class="ti ti-moon"></i> Dinner · 저녁 &nbsp;17:00–21:00</div>
+    <button class="btn ghost" onclick="toggleAllToday('dinner')"><i class="ti ti-list"></i> All · 전체</button>
+  </div>
+  <div id="today-slots-dinner"></div>
+</div>
+
+<!-- PAGE: Monthly -->
+<div class="page" id="page-monthly">
+  <div class="card">
+    <div class="month-nav">
+      <button class="btn" onclick="changeMonth(-1)"><i class="ti ti-chevron-left"></i></button>
+      <div class="month-label">
+        <div class="ml-main" id="month-label-main"></div>
+        <div class="ml-sub" id="month-label-sub"></div>
+      </div>
+      <button class="btn" onclick="changeMonth(1)"><i class="ti ti-chevron-right"></i></button>
+    </div>
+    <div class="metric-grid" id="month-metrics"></div>
+    <div class="cal-grid" id="cal-hdr"></div>
+    <div class="cal-grid" id="cal-body"></div>
+    <div class="cal-legend">
+      <span>Left=Lunch &nbsp;|&nbsp; Right=Dinner</span>
+      <span><span class="legend-dot" style="background:#1D9E75"></span>Available</span>
+      <span><span class="legend-dot" style="background:#D4920A"></span>Busy</span>
+      <span><span class="legend-dot" style="background:#C0392B"></span>Full</span>
+    </div>
+  </div>
+</div>
+<!-- PAGE: Daily -->
+<div class="page" id="page-daily">
+  <div class="page-header">
+    <button class="page-back" onclick="showTab('monthly')"><i class="ti ti-chevron-left"></i> Monthly</button>
+    <div style="flex:1">
+      <div class="page-title" id="daily-title"></div>
+      <div class="page-sub">Daily Reservations · 일별 예약 현황</div>
+    </div>
+    <button class="btn no-print" onclick="printDaily()"><i class="ti ti-printer"></i> Print · 인쇄</button>
+    <button class="btn no-print" style="background:#0A3070;color:#fff;border-color:#0A3070" onclick="showCompanyNotice()"><i class="ti ti-building-store"></i> 회사별 통보</button>
+  </div>
+  <div class="card">
+    <div class="metric-grid" id="daily-metrics"></div>
+    <div class="cap-row">
+      <div class="cap-block lb">
+        <div class="cap-title lt"><i class="ti ti-sun" style="font-size:12px"></i> Lunch · 점심 (max 200)</div>
+        <div class="cap-bar"><div class="cap-fill" id="lunch-fill" style="width:0%"></div></div>
+        <div class="cap-txt lt" id="lunch-txt"></div>
+      </div>
+      <div class="cap-block db">
+        <div class="cap-title dt"><i class="ti ti-moon" style="font-size:12px"></i> Dinner · 저녁 (max 200)</div>
+        <div class="cap-bar"><div class="cap-fill" id="dinner-fill" style="width:0%"></div></div>
+        <div class="cap-txt dt" id="dinner-txt"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec-div">
+    <div class="sec-div-label"><i class="ti ti-sun"></i> Lunch · 점심 &nbsp;11:00-14:00</div>
+    <button class="btn ghost" onclick="toggleAll('lunch')"><i class="ti ti-list"></i> All · 전체</button>
+  </div>
+  <div id="slots-lunch"></div>
+  <div class="sec-div" style="margin-top:20px">
+    <div class="sec-div-label"><i class="ti ti-moon"></i> Dinner · 저녁 &nbsp;17:00-21:00</div>
+    <button class="btn ghost" onclick="toggleAll('dinner')"><i class="ti ti-list"></i> All · 전체</button>
+  </div>
+  <div id="slots-dinner"></div>
+</div>
+<!-- PAGE: Input -->
+<div class="page" id="page-input">
+  <div class="page-header">
+    <button class="page-back" onclick="showTab('daily')"><i class="ti ti-chevron-left"></i> Daily</button>
+    <div style="flex:1">
+      <div class="page-title" id="input-title">New Reservation · 신규 예약</div>
+      <div class="page-sub" id="input-subtitle"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="edit-banner" id="edit-banner"><i class="ti ti-edit"></i><span id="edit-banner-txt"></span></div>
+    <div class="warn-bar" id="warn-bar"></div>
+    <div class="type-toggle">
+      <div class="type-btn active" onclick="setType('tour')" id="btn-tour"><i class="ti ti-bus"></i> Tour Group <sub>투어 단체</sub></div>
+      <div class="type-btn" onclick="setType('walkin')" id="btn-walkin"><i class="ti ti-walk"></i> Walk-in <sub>워크인</sub></div>
+    </div>
+    <div id="datetime-select" style="display:none">
+      <div class="form-grid">
+        <div class="form-field"><label>Date <span class="lbl-kr">날짜</span> *</label><input type="date" id="sel-date"></div>
+        <div class="form-field"><label>Time <span class="lbl-kr">시간</span> *</label>
+          <select id="sel-time">
+            <option value="">Select</option>
+            <optgroup label="Lunch (11:00-14:00)">
+              <option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option>
+            </optgroup>
+            <optgroup label="Dinner (17:00-21:00)">
+              <option>17:00</option><option>17:30</option><option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option><option>20:00</option><option>20:30</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+    </div>
+    <!-- Tour Form -->
+    <div id="form-tour">
+      <div class="form-sec-lbl no-top">Basic Info · 기본 정보</div>
+      <div class="form-grid">
+        <div class="form-field"><label>Tour Company <span class="lbl-kr">투어 회사명</span> *</label>
+          <div class="ac-wrap"><div class="ac-row"><input type="text" id="t-company" placeholder="e.g. Plus Tour, JDR" oninput="acFilter('t-company','company')" onfocus="acOpen('t-company','company')" autocomplete="off">
+          <button class="ac-btn" onclick="acToggle('t-company','company')" type="button"><i class="ti ti-chevron-down"></i></button></div>
+          <div class="ac-dropdown" id="ac-t-company"></div>
+          <div class="ac-hint"><i class="ti ti-info-circle"></i> Auto-saved · 자동 저장</div></div>
+        </div>
+        <div class="form-field"><label>Guide Name <span class="lbl-kr">가이드 이름</span> *</label>
+          <div class="ac-wrap"><div class="ac-row"><input type="text" id="t-guide" placeholder="Guide name" oninput="acFilter('t-guide','guide')" onfocus="acOpen('t-guide','guide')" autocomplete="off">
+          <button class="ac-btn" onclick="acToggle('t-guide','guide')" type="button"><i class="ti ti-chevron-down"></i></button></div>
+          <div class="ac-dropdown" id="ac-t-guide"></div></div>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Guests <span class="lbl-kr">인원</span> *</label><input type="number" id="t-pax" placeholder="No. of guests" min="1" max="200" oninput="checkRemain()"></div>
+        <div class="form-field"><label>Menu Type <span class="lbl-kr">식사 종류</span> *</label>
+          <select id="t-menu">
+            <option value="">Select</option>
+            <option>Samgyeopsal BBQ · 삼겹살 바베큐</option>
+            <option>Korean Set Meal · 한정식 셋트</option>
+            <option>Bibimbap Set · 비빔밥 셋트</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-sec-lbl">Additional Info · 추가 정보</div>
+      <div class="form-grid">
+        <div class="form-field"><label>Contact Name <span class="lbl-kr">예약자명</span></label>
+          <div class="ac-wrap"><div class="ac-row"><input type="text" id="t-name" placeholder="Name" oninput="acFilter('t-name','tname')" onfocus="acOpen('t-name','tname')" autocomplete="off">
+          <button class="ac-btn" onclick="acToggle('t-name','tname')" type="button"><i class="ti ti-chevron-down"></i></button></div>
+          <div class="ac-dropdown" id="ac-t-name"></div></div>
+        </div>
+        <div class="form-field"><label>Phone <span class="lbl-kr">연락처</span></label><input type="text" id="t-phone" placeholder="Phone number"></div>
+      </div>
+      <div class="form-grid single">
+        <div class="form-field"><label>Remarks <span class="lbl-kr">비고</span></label>
+          <div class="ac-wrap"><div class="ac-row"><textarea id="t-note" placeholder="Special requests" rows="2" oninput="acFilter('t-note','tnote')" onfocus="acOpen('t-note','tnote')"></textarea>
+          <button class="ac-btn" onclick="acToggle('t-note','tnote')" type="button" style="align-self:flex-start;height:38px"><i class="ti ti-chevron-down"></i></button></div>
+          <div class="ac-dropdown" id="ac-t-note"></div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Walk-in Form -->
+    <div id="form-walkin" style="display:none">
+      <div class="form-sec-lbl no-top">Basic Info · 기본 정보</div>
+      <div class="form-grid">
+        <div class="form-field"><label>Guest Name <span class="lbl-kr">예약자명</span></label>
+          <div class="ac-wrap"><div class="ac-row"><input type="text" id="w-name" placeholder="Name or TBD" oninput="acFilter('w-name','wname')" onfocus="acOpen('w-name','wname')" autocomplete="off">
+          <button class="ac-btn" onclick="acToggle('w-name','wname')" type="button"><i class="ti ti-chevron-down"></i></button></div>
+          <div class="ac-dropdown" id="ac-w-name"></div></div>
+        </div>
+        <div class="form-field"><label>Guests <span class="lbl-kr">인원</span> *</label><input type="number" id="w-pax" placeholder="No. of guests" min="1" max="200" oninput="checkRemain()"></div>
+      </div>
+      <div class="form-grid single">
+        <div class="form-field"><label>Phone <span class="lbl-kr">연락처</span></label><input type="text" id="w-phone" placeholder="Phone number"></div>
+      </div>
+      <div class="form-grid single">
+        <div class="form-field"><label>Remarks <span class="lbl-kr">비고</span></label>
+          <div class="ac-wrap"><div class="ac-row"><textarea id="w-note" placeholder="Menu, requests" rows="2" oninput="acFilter('w-note','wnote')" onfocus="acOpen('w-note','wnote')"></textarea>
+          <button class="ac-btn" onclick="acToggle('w-note','wnote')" type="button" style="align-self:flex-start;height:38px"><i class="ti ti-chevron-down"></i></button></div>
+          <div class="ac-dropdown" id="ac-w-note"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="cancelEdit()"><i class="ti ti-x"></i> <span id="cancel-btn-txt">Reset · 초기화</span></button>
+      <button class="btn primary" onclick="saveReservation(false)"><i class="ti ti-device-floppy"></i> <span id="save-btn-txt">Save · 저장</span></button>
+      <button class="btn success" onclick="saveReservation(true)"><i class="ti ti-arrow-back-up"></i> <span id="saveback-btn-txt">Save &amp; Back · 저장 후 돌아가기</span></button>
+    </div>
+  </div>
+  <div id="existing-reservations"></div>
+</div>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, set, update, remove, onValue }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA1gW5J81rJPdJ3VNBWAm3RQ1Y5-ROMQRY",
+  authDomain: "myungga-reservation.firebaseapp.com",
+  databaseURL: "https://myungga-reservation-default-rtdb.firebaseio.com",
+  projectId: "myungga-reservation",
+  storageBucket: "myungga-reservation.firebasestorage.app",
+  messagingSenderId: "383970594842",
+  appId: "1:383970594842:web:4b0fb1998a8a89b5dec1a3",
+  measurementId: "G-X490GQ65WZ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+const MAX_PAX = 200;
+let reservations = [];
+let viewMonth = new Date();
+let selectedDate = '';
+let selectedTime = '';
+let currentType = 'tour';
+let openSlots = {};
+let editingId = null;
+let fromNewBtn = false;
+
+const LUNCH  = ['11:00','11:30','12:00','12:30','13:00','13:30'];
+const DINNER = ['17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30'];
+
+let acStore = {
+  company:['Plus Tour','JDR','Asia Sunny'],
+  guide:['Mr. Hong','Tony','Ms. Park','Chang','Ms. Kim'],
+  tname:[],tnote:['VIP','Window seat preferred','Allergic to nuts'],
+  wname:[],wnote:['BBQ','Set menu','Vegetarian']
+};
+
+function showLoading(s){ document.getElementById('loading-overlay').style.display = s?'flex':'none'; }
+function showToast(msg,color){ const el=document.getElementById('toast');el.textContent=msg;el.style.background=color||'var(--text)';el.style.display='block';setTimeout(()=>el.style.display='none',2400); }
+function isLunch(t){ return LUNCH.includes(t); }
+function getPeriod(t){ return isLunch(t)?'lunch':'dinner'; }
+function timePax(date,period,excludeId=null){ return reservations.filter(r=>r.date===date&&(period==='lunch'?LUNCH:DINNER).includes(r.time)&&r.id!==excludeId).reduce((s,r)=>s+r.pax,0); }
+function todayStr(){ const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function dotColor(pax){ if(!pax)return 'dot-empty';const p=pax/MAX_PAX*100;return p>=100?'dot-full':p>=75?'dot-warn':'dot-ok'; }
+
+window.acOpen=function(fid,key){ const val=document.getElementById(fid).value.trim().toLowerCase();const list=acStore[key]||[];renderAC(fid,key,val?list.filter(x=>x.toLowerCase().includes(val)):list); };
+window.acFilter=function(fid,key){ const val=document.getElementById(fid).value.trim().toLowerCase();const list=acStore[key]||[];renderAC(fid,key,val?list.filter(x=>x.toLowerCase().includes(val)):list); };
+window.acToggle=function(fid,key){ const dd=document.getElementById('ac-'+fid);if(dd.classList.contains('open'))dd.classList.remove('open');else window.acOpen(fid,key); };
+function renderAC(fid,key,items){ const dd=document.getElementById('ac-'+fid);if(!dd)return;dd.innerHTML=!items.length?`<div class="ac-empty">No saved entries yet</div>`:items.map(item=>`<div class="ac-item" onclick="acSelect('${fid}','${item.replace(/'/g,"\\'")}')"><span>${item}</span><button class="ac-del" onclick="event.stopPropagation();acDel('${key}','${item.replace(/'/g,"\\'")}','${fid}')">x</button></div>`).join('');dd.classList.add('open');setTimeout(()=>{const close=e=>{if(!dd.contains(e.target)&&e.target.id!==fid){dd.classList.remove('open');document.removeEventListener('click',close);}};document.addEventListener('click',close);},0); }
+window.acSelect=function(fid,val){ const el=document.getElementById(fid);if(el)el.value=val;const dd=document.getElementById('ac-'+fid);if(dd)dd.classList.remove('open'); };
+window.acDel=function(key,val,fid){ acStore[key]=(acStore[key]||[]).filter(x=>x!==val);saveAcStore();window.acOpen(fid,key);showToast('Removed: "'+val+'"'); };
+function acLearn(key,val){ if(!val||!val.trim())return;const v=val.trim();if(!acStore[key])acStore[key]=[];if(!acStore[key].includes(v))acStore[key].unshift(v);if(acStore[key].length>50)acStore[key]=acStore[key].slice(0,50); }
+function saveAcStore(){ set(ref(db,'acStore'),acStore).catch(e=>console.warn('AC save failed',e)); }
+
+window.showTab=function(tab){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+tab).classList.add('active');document.getElementById('nav-'+tab).classList.add('active');if(tab==='today')renderToday();if(tab==='monthly')renderMonthly();if(tab==='daily')renderDaily();if(tab==='input'&&!selectedDate){fromNewBtn=true;document.getElementById('datetime-select').style.display='block';document.getElementById('sel-date').value=todayStr();document.getElementById('input-title').textContent='New Reservation';document.getElementById('input-subtitle').textContent='Select date & time';document.getElementById('edit-banner').style.display='none';clearForm();}else if(tab==='input'){fromNewBtn=false;document.getElementById('datetime-select').style.display='none';} };
+window.changeMonth=function(dir){ viewMonth=new Date(viewMonth.getFullYear(),viewMonth.getMonth()+dir,1);renderMonthly(); };
+
+function renderMonthly(){
+  const y=viewMonth.getFullYear(),m=viewMonth.getMonth();
+  const prefix=`${y}-${String(m+1).padStart(2,'0')}`;
+  document.getElementById('month-label-main').textContent=`${new Date(y,m,1).toLocaleString('en',{month:'long'})} ${y}`;
+  document.getElementById('month-label-sub').textContent=`${m+1}월 ${y}년`;
+  const mr=reservations.filter(r=>r.date.startsWith(prefix));
+  const tp=mr.reduce((s,r)=>s+r.pax,0);
+  document.getElementById('month-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Reservations<br><span style="font-size:10px">예약 건수</span></div><div class="metric-value">${mr.length}</div></div>
+    <div class="metric"><div class="metric-label">Total Guests<br><span style="font-size:10px">총 인원</span></div><div class="metric-value">${tp}</div></div>
+    <div class="metric"><div class="metric-label">Tour / Walk-in<br><span style="font-size:10px">투어/워크인</span></div><div class="metric-value" style="font-size:18px">${mr.filter(r=>r.type==='tour').length}/${mr.filter(r=>r.type==='walkin').length}</div></div>
+    <div class="metric"><div class="metric-label">Days Open<br><span style="font-size:10px">영업일</span></div><div class="metric-value">${[...new Set(mr.map(r=>r.date))].length}</div></div>`;
+  document.getElementById('cal-hdr').innerHTML=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-hdr">${d}</div>`).join('');
+  const firstDay=new Date(y,m,1).getDay(),lastDate=new Date(y,m+1,0).getDate(),today=todayStr();
+  let html='';
+  for(let i=0;i<firstDay;i++)html+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=lastDate;d++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const lp=timePax(ds,'lunch'),dp=timePax(ds,'dinner');
+    html+=`<div class="cal-cell${ds===today?' today':''}" onclick="openDay('${ds}')"><div class="day-num">${d}</div><div class="day-dots"><div class="day-dot ${dotColor(lp)}"></div><div class="day-dot ${dotColor(dp)}"></div></div>${(lp+dp)>0?`<div class="day-pax">${lp+dp}</div>`:''}</div>`;
+  }
+  document.getElementById('cal-body').innerHTML=html;
+}
+
+window.openDay=function(ds){ selectedDate=ds;openSlots={};showTab('daily'); };
+
+function renderDaily(){
+  if(!selectedDate)selectedDate=todayStr();
+  const [y,m,d]=selectedDate.split('-');
+  document.getElementById('daily-title').textContent=`${new Date(selectedDate+'T12:00:00').toLocaleString('en',{weekday:'long'})}, ${parseInt(m)}/${parseInt(d)}/${y}`;
+  const lp=timePax(selectedDate,'lunch'),dp=timePax(selectedDate,'dinner');
+  const lpct=Math.min(100,Math.round(lp/MAX_PAX*100)),dpct=Math.min(100,Math.round(dp/MAX_PAX*100));
+  const lc=lpct>=100?'#C0392B':lpct>=75?'#D4920A':'#1D9E75';
+  const dc=dpct>=100?'#C0392B':dpct>=75?'#D4920A':'#1D9E75';
+  document.getElementById('daily-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Lunch Guests<br><span style="font-size:10px">점심 인원</span></div><div class="metric-value">${lp}</div></div>
+    <div class="metric"><div class="metric-label">Lunch Available<br><span style="font-size:10px">점심 잔여</span></div><div class="metric-value" style="color:${lc}">${Math.max(0,MAX_PAX-lp)}</div></div>
+    <div class="metric"><div class="metric-label">Dinner Guests<br><span style="font-size:10px">저녁 인원</span></div><div class="metric-value">${dp}</div></div>
+    <div class="metric"><div class="metric-label">Dinner Available<br><span style="font-size:10px">저녁 잔여</span></div><div class="metric-value" style="color:${dc}">${Math.max(0,MAX_PAX-dp)}</div></div>`;
+  document.getElementById('lunch-fill').style.cssText=`width:${lpct}%;background:${lc}`;
+  document.getElementById('lunch-txt').textContent=`${lp} / 200 guests (${lpct}%)`;
+  document.getElementById('dinner-fill').style.cssText=`width:${dpct}%;background:${dc}`;
+  document.getElementById('dinner-txt').textContent=`${dp} / 200 guests (${dpct}%)`;
+  renderDailySlots();
+}
+
+function renderDailySlots(){
+  document.getElementById('slots-lunch').innerHTML=LUNCH.map(t=>slotHTML(t,'lunch')).join('');
+  document.getElementById('slots-dinner').innerHTML=DINNER.map(t=>slotHTML(t,'dinner')).join('');
+}
+
+function slotHTML(time,period){
+  const recs=reservations.filter(r=>r.date===selectedDate&&r.time===time);
+  const pax=recs.reduce((s,r)=>s+r.pax,0);
+  const isOpen=openSlots[time];
+  const badgeCls=period==='lunch'?'badge-lunch':'badge-dinner';
+  const badgeTxt=period==='lunch'?'Lunch · 점심':'Dinner · 저녁';
+  let rows='';
+  if(!recs.length){
+    rows=`<div class="empty-slot">No reservations — <a onclick="openInput('${time}')">Add · 추가하기</a></div>`;
+  } else {
+    recs.forEach(r=>{
+      const typeBadge=r.type==='tour'?`<span class="res-type rt-tour">Tour</span>`:`<span class="res-type rt-walkin">Walk-in</span>`;
+      const name=r.type==='tour'?r.company:r.name||'Walk-in';
+      const line2=r.type==='tour'?`Guide: ${r.guide} · ${r.menu}`:r.note||'—';
+      const phone=r.phone?` · ☎ ${r.phone}`:'';
+      const cname=r.type==='tour'&&r.name?` <span style="font-weight:400;color:var(--text3)">· ${r.name}</span>`:'';
+      const note2=r.note&&r.type==='tour'?`<br><i class="ti ti-notes" style="font-size:11px"></i> ${r.note}`:'';
+      rows+=`<div class="res-row"><div>${typeBadge}</div><div class="res-info"><div class="res-name">${name}${cname}</div><div class="res-detail">${line2}${phone}${note2}</div></div><div style="display:flex;align-items:center;gap:4px"><span class="res-pax">${r.pax}</span><button class="btn ghost" onclick="startEdit('${r.id}')" title="Edit"><i class="ti ti-edit" style="color:var(--blue)"></i></button><button class="btn danger-ghost" onclick="deleteRes('${r.id}')" title="Delete"><i class="ti ti-trash"></i></button></div></div>`;
+    });
+  }
+  return `<div class="time-slot"><div class="ts-header" onclick="toggleSlot('${time}')"><div style="display:flex;align-items:center;gap:10px"><span class="ts-time">${time}</span><span class="badge ${badgeCls}">${badgeTxt}</span>${pax>0?`<span class="badge badge-count">${pax} pax</span>`:''}</div><div class="ts-right"><button class="badge-add" onclick="event.stopPropagation();openInput('${time}')"><i class="ti ti-plus"></i> Add</button><i class="ti ${isOpen?'ti-chevron-up':'ti-chevron-down'}" style="color:var(--text3)"></i></div></div><div class="slot-list${isOpen?' open':''}">${rows}</div></div>`;
+}
+
+window.toggleSlot=function(t){ openSlots[t]=!openSlots[t];renderDailySlots(); };
+window.toggleAll=function(period){ const times=period==='lunch'?LUNCH:DINNER;const anyOpen=times.some(t=>openSlots[t]);times.forEach(t=>openSlots[t]=!anyOpen);renderDailySlots(); };
+
+window.openInput=function(time){
+  selectedTime=time;fromNewBtn=false;
+  const [y,m,d]=selectedDate.split('-');
+  const period=isLunch(time)?'Lunch · 점심':'Dinner · 저녁';
+  const remain=MAX_PAX-timePax(selectedDate,getPeriod(time),editingId);
+  document.getElementById('input-title').textContent=`${parseInt(m)}/${parseInt(d)}/${y}  ${time}`;
+  document.getElementById('input-subtitle').textContent=`${period} — ${remain} guests available`;
+  document.getElementById('datetime-select').style.display='none';
+  editingId=null;
+  document.getElementById('edit-banner').style.display='none';
+  document.getElementById('save-btn-txt').textContent='Save · 저장';
+  document.getElementById('saveback-btn-txt').textContent='Save & Back · 저장 후 돌아가기';
+  document.getElementById('cancel-btn-txt').textContent='Reset · 초기화';
+  clearForm();checkRemain();renderExisting();showTab('input');
+};
+
+window.startEdit=function(id){
+  const r=reservations.find(x=>x.id===id);if(!r)return;
+  selectedTime=r.time;editingId=id;fromNewBtn=false;
+  const [y,m,d]=selectedDate.split('-');
+  const period=isLunch(r.time)?'Lunch · 점심':'Dinner · 저녁';
+  const remain=MAX_PAX-timePax(selectedDate,getPeriod(r.time),editingId);
+  document.getElementById('input-title').textContent=`${parseInt(m)}/${parseInt(d)}/${y}  ${r.time}`;
+  document.getElementById('input-subtitle').textContent=`${period} — ${remain} guests available`;
+  document.getElementById('datetime-select').style.display='none';
+  document.getElementById('edit-banner').style.display='flex';
+  document.getElementById('edit-banner-txt').textContent=`Editing: ${r.type==='tour'?r.company:r.name||'Walk-in'}`;
+  document.getElementById('save-btn-txt').textContent='Update · 수정 저장';
+  document.getElementById('saveback-btn-txt').textContent='Update & Back';
+  document.getElementById('cancel-btn-txt').textContent='Cancel · 취소';
+  setType(r.type);
+  if(r.type==='tour'){
+    document.getElementById('t-company').value=r.company||'';
+    document.getElementById('t-guide').value=r.guide||'';
+    document.getElementById('t-pax').value=r.pax||'';
+    document.getElementById('t-menu').value=r.menu||'';
+    document.getElementById('t-name').value=r.name||'';
+    document.getElementById('t-phone').value=r.phone||'';
+    document.getElementById('t-note').value=r.note||'';
+  } else {
+    document.getElementById('w-name').value=r.name||'';
+    document.getElementById('w-pax').value=r.pax||'';
+    document.getElementById('w-phone').value=r.phone||'';
+    document.getElementById('w-note').value=r.note||'';
+  }
+  checkRemain();renderExisting();
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('nav-input').classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-input').classList.add('active');
+};
+
+window.cancelEdit=function(){
+  if(editingId){editingId=null;document.getElementById('edit-banner').style.display='none';document.getElementById('save-btn-txt').textContent='Save · 저장';document.getElementById('saveback-btn-txt').textContent='Save & Back';document.getElementById('cancel-btn-txt').textContent='Reset · 초기화';clearForm();checkRemain();renderExisting();}else{clearForm();}
+};
+
+function renderExisting(){
+  const recs=reservations.filter(r=>r.date===selectedDate&&r.time===selectedTime&&r.id!==editingId);
+  const el=document.getElementById('existing-reservations');
+  if(!recs.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="card"><div class="card-title">Other at ${selectedTime} · 동일 시간 기존 예약</div>${recs.map(r=>`<div class="res-row" style="padding:10px 0;border-bottom:1px solid var(--bg2)"><span class="res-type ${r.type==='tour'?'rt-tour':'rt-walkin'}">${r.type==='tour'?'Tour':'Walk-in'}</span><div class="res-info"><div class="res-name">${r.type==='tour'?`${r.company} · ${r.guide}`:r.name||'Walk-in'} <span style="font-weight:400;color:var(--text3)">${r.pax} pax</span></div><div class="res-detail">${r.type==='tour'?r.menu:r.note||'—'}</div></div><button class="btn ghost" onclick="startEdit('${r.id}')" style="color:var(--blue)"><i class="ti ti-edit"></i></button><button class="btn danger-ghost" onclick="deleteRes('${r.id}')"><i class="ti ti-trash"></i></button></div>`).join('')}</div>`;
+}
+
+window.deleteRes=async function(id){
+  if(!confirm('Delete this reservation?\n이 예약을 삭제하시겠습니까?'))return;
+  showLoading(true);
+  try{
+    await remove(ref(db,`reservations/${id}`));
+    if(String(editingId)===String(id)){editingId=null;clearForm();}
+    showToast('Deleted · 삭제되었습니다.');
+  }catch(e){showToast('Delete error: '+e.message);}
+  showLoading(false);
+};
+
+window.checkRemain=function(){
+  if(!selectedTime)return;
+  const period=getPeriod(selectedTime);
+  const remain=MAX_PAX-timePax(selectedDate,period,editingId);
+  const pax=parseInt(currentType==='tour'?document.getElementById('t-pax').value:document.getElementById('w-pax').value)||0;
+  const bar=document.getElementById('warn-bar');bar.className='warn-bar';
+  if(remain<=0){bar.textContent=`⚠️ ${period==='lunch'?'Lunch':'Dinner'} fully booked (200/200)`;bar.classList.add('over');bar.style.display='block';}
+  else if(pax>remain){bar.textContent=`⚠️ Over capacity — ${remain} guests remaining`;bar.classList.add('caution');bar.style.display='block';}
+  else if(remain<50){bar.textContent=`⚠️ Almost full — ${remain} guests remaining`;bar.classList.add('caution');bar.style.display='block';}
+  else{bar.style.display='none';}
+};
+
+window.setType=function(t){
+  currentType=t;
+  document.getElementById('btn-tour').classList.toggle('active',t==='tour');
+  document.getElementById('btn-walkin').classList.toggle('active',t==='walkin');
+  document.getElementById('form-tour').style.display=t==='tour'?'block':'none';
+  document.getElementById('form-walkin').style.display=t==='walkin'?'block':'none';
+  checkRemain();
+};
+
+function clearForm(){
+  ['t-company','t-guide','t-pax','t-name','t-phone','t-note','w-name','w-pax','w-phone','w-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const m=document.getElementById('t-menu');if(m)m.value='';
+  document.querySelectorAll('.ac-dropdown').forEach(d=>d.classList.remove('open'));
+}
+
+window.saveReservation=async function(goBack){
+  if(fromNewBtn){
+    const selDate=document.getElementById('sel-date').value;
+    const selTime=document.getElementById('sel-time').value;
+    if(!selDate||!selTime){showToast('Please select date & time');return;}
+    selectedDate=selDate;selectedTime=selTime;
+  }
+  if(!selectedDate||!selectedTime){showToast('Date/time not set');return;}
+  let r={date:selectedDate,time:selectedTime};
+  if(currentType==='tour'){
+    const company=document.getElementById('t-company').value.trim();
+    const guide=document.getElementById('t-guide').value.trim();
+    const pax=parseInt(document.getElementById('t-pax').value)||0;
+    const menu=document.getElementById('t-menu').value;
+    if(!company||!guide||!pax||!menu){showToast('Please fill required fields');return;}
+    const name=document.getElementById('t-name').value.trim();
+    const note=document.getElementById('t-note').value.trim();
+    acLearn('company',company);acLearn('guide',guide);
+    if(name)acLearn('tname',name);if(note)acLearn('tnote',note);
+    Object.assign(r,{type:'tour',company,guide,pax,menu,name,phone:document.getElementById('t-phone').value.trim(),note});
+  } else {
+    const pax=parseInt(document.getElementById('w-pax').value)||0;
+    if(!pax){showToast('Please enter number of guests');return;}
+    const name=document.getElementById('w-name').value.trim()||'Walk-in';
+    const note=document.getElementById('w-note').value.trim();
+    if(name!=='Walk-in')acLearn('wname',name);if(note)acLearn('wnote',note);
+    Object.assign(r,{type:'walkin',pax,name,phone:document.getElementById('w-phone').value.trim(),note});
+  }
+  const period=getPeriod(selectedTime);
+  const periodPax=timePax(selectedDate,period,editingId);
+  if(periodPax+r.pax>MAX_PAX){showToast(`Over capacity! ${MAX_PAX-periodPax} remaining`);return;}
+  showLoading(true);
+  try{
+    if(editingId){
+      await update(ref(db,`reservations/${editingId}`),r);
+      showToast('Updated · 수정되었습니다!','#1A4A8A');
+      editingId=null;
+      document.getElementById('edit-banner').style.display='none';
+      document.getElementById('save-btn-txt').textContent='Save · 저장';
+      document.getElementById('saveback-btn-txt').textContent='Save & Back';
+      document.getElementById('cancel-btn-txt').textContent='Reset · 초기화';
+    } else {
+      await push(ref(db,'reservations'),r);
+      openSlots[selectedTime]=true;
+      showToast('Saved · 저장되었습니다!','#1D6A4A');
+    }
+    saveAcStore();
+    if(goBack){showTab('daily');}
+    else{
+      clearForm();renderExisting();checkRemain();
+      const remain2=MAX_PAX-timePax(selectedDate,getPeriod(selectedTime));
+      document.getElementById('input-subtitle').textContent=`${isLunch(selectedTime)?'Lunch · 점심':'Dinner · 저녁'} — ${remain2} guests available`;
+    }
+  }catch(e){showToast('Save error: '+e.message);}
+  showLoading(false);
+};
+
+window.printDaily=function(){
+  const [y,m,d]=selectedDate.split('-');
+  const dayName=new Date(selectedDate+'T12:00:00').toLocaleString('en',{weekday:'long'});
+  const monthName=new Date(selectedDate+'T12:00:00').toLocaleString('en',{month:'long'});
+  const dateLabel=`${dayName}, ${monthName} ${parseInt(d)}, ${y}`;
+  const dateKr=`${y}년 ${parseInt(m)}월 ${parseInt(d)}일`;
+  const lp=timePax(selectedDate,'lunch'),dp=timePax(selectedDate,'dinner');
+  const total=reservations.filter(r=>r.date===selectedDate).length;
+  const lpct=Math.min(100,Math.round(lp/200*100)),dpct=Math.min(100,Math.round(dp/200*100));
+  function rows(times){
+    const recs=reservations.filter(r=>r.date===selectedDate&&times.includes(r.time)).sort((a,b)=>a.time.localeCompare(b.time));
+    if(!recs.length)return `<tr><td colspan="7" style="text-align:center;color:#999;font-style:italic">No reservations</td></tr>`;
+    return recs.map((r,i)=>{
+      const name=r.type==='tour'?r.company:r.name||'Walk-in';
+      const guide=r.type==='tour'?r.guide:'—';
+      const menuNote=r.type==='tour'?r.menu:r.note||'—';
+      const phone=r.phone?`<br>☎ ${r.phone}`:'';
+      const extraNote=r.note&&r.type==='tour'?`<br><i>${r.note}</i>`:'';
+      const contactName=r.type==='tour'&&r.name?`<br><span style="font-weight:normal;color:#555">${r.name}</span>`:'';
+      return `<tr class="${r.type==='tour'?'tr-tour':'tr-walkin'}"><td class="td-num">${i+1}</td><td class="td-time">${r.time}</td><td>${r.type==='tour'?'Tour':'Walk-in'}</td><td><b>${name}</b>${contactName}</td><td>${guide}</td><td class="td-pax">${r.pax}</td><td>${menuNote}${phone}${extraNote}</td></tr>`;
+    }).join('');
+  }
+  const now=new Date().toLocaleString('en',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('print-area').innerHTML=`
+    <div class="ph"><div class="ph-left"><h1>Myungga Korean Restaurant · 명가 한식당</h1><p>Daily Reservation Sheet · 일별 예약 현황</p></div><div class="ph-date">${dateLabel}<span>${dateKr}</span></div></div>
+    <div class="ps">
+      <div class="ps-item lunch"><div class="ps-lbl">Lunch Guests</div><div class="ps-val">${lp}<span style="font-size:8px;font-weight:normal"> / 200</span></div></div>
+      <div class="ps-item lunch"><div class="ps-lbl">Lunch Available</div><div class="ps-val" style="color:${lpct>=100?'#C0392B':lpct>=75?'#D4920A':'#1D6A4A'}">${Math.max(0,200-lp)}</div></div>
+      <div class="ps-item dinner"><div class="ps-lbl">Dinner Guests</div><div class="ps-val">${dp}<span style="font-size:8px;font-weight:normal"> / 200</span></div></div>
+      <div class="ps-item dinner"><div class="ps-lbl">Dinner Available</div><div class="ps-val" style="color:${dpct>=100?'#C0392B':dpct>=75?'#D4920A':'#1D6A4A'}">${Math.max(0,200-dp)}</div></div>
+      <div class="ps-item total"><div class="ps-lbl">Total Reservations</div><div class="ps-val">${total}건</div></div>
+    </div>
+    <div class="pt-title">☀ LUNCH 11:00-14:00 <span>Capacity: ${lp}/200 (${lpct}%)</span></div>
+    <table><colgroup><col class="col-num"><col class="col-time"><col class="col-type"><col class="col-name"><col class="col-guide"><col class="col-pax"><col class="col-menu"></colgroup>
+    <thead><tr><th>#</th><th>Time</th><th>Type</th><th>Name</th><th>Guide</th><th>Pax</th><th>Menu/Remarks</th></tr></thead><tbody>${rows(LUNCH)}</tbody></table>
+    <div class="pt-title">🌙 DINNER 17:00-21:00 <span>Capacity: ${dp}/200 (${dpct}%)</span></div>
+    <table><colgroup><col class="col-num"><col class="col-time"><col class="col-type"><col class="col-name"><col class="col-guide"><col class="col-pax"><col class="col-menu"></colgroup>
+    <thead><tr><th>#</th><th>Time</th><th>Type</th><th>Name</th><th>Guide</th><th>Pax</th><th>Menu/Remarks</th></tr></thead><tbody>${rows(DINNER)}</tbody></table>
+    <div class="pf"><div class="p-legend"><span><span class="p-dot" style="background:#EEF4FF"></span> Tour</span><span><span class="p-dot" style="background:#EEF9F4"></span> Walk-in</span></div><div>Printed: ${now} | Myungga Korean Restaurant</div></div>`;
+  window.print();
+};
+
+// Firebase 실시간 리스너 - reservations
+onValue(ref(db,'reservations'),snapshot=>{
+  reservations=[];
+  if(snapshot.exists()){snapshot.forEach(child=>{reservations.push({id:child.key,...child.val()});});}
+  const activeId=document.querySelector('.page.active')?.id;
+  if(activeId==='page-today')renderToday();
+  if(activeId==='page-monthly')renderMonthly();
+  if(activeId==='page-daily')renderDaily();
+  if(activeId==='page-input'){renderExisting();checkRemain();}
+});
+
+// Firebase 실시간 리스너 - acStore
+onValue(ref(db,'acStore'),snapshot=>{
+  if(snapshot.exists()){try{Object.assign(acStore,snapshot.val());}catch(e){}}
+});
+
+// ── 회사별 통보 ──
+window.showCompanyNotice = function(){
+  const modal = document.getElementById('company-modal');
+  const [y,m,d] = selectedDate.split('-');
+  const dateStr = new Date(selectedDate+'T12:00:00').toLocaleString('en',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('modal-date-label').textContent = dateStr + ' · ' + y+'년 '+parseInt(m)+'월 '+parseInt(d)+'일';
+
+  // 투어 예약만 회사별로 분류
+  const tourRecs = reservations.filter(r => r.date === selectedDate && r.type === 'tour');
+  const companies = {};
+  tourRecs.forEach(r => {
+    if(!companies[r.company]) companies[r.company] = [];
+    companies[r.company].push(r);
+  });
+
+  const list = document.getElementById('company-list');
+  if(!Object.keys(companies).length){
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:#4A5570;font-size:13px">해당 날짜에 투어 예약이 없습니다.</div>';
+  } else {
+    list.innerHTML = Object.entries(companies).map(([company, recs]) => {
+      const totalPax = recs.reduce((s,r)=>s+r.pax,0);
+      const rows = recs.sort((a,b)=>a.time.localeCompare(b.time)).map(r => {
+        const isL = ['11:00','11:30','12:00','12:30','13:00','13:30'].includes(r.time);
+        return `<div class="notice-row">
+          <span class="notice-time">${r.time}</span>
+          <span class="notice-period ${isL?'np-lunch':'np-dinner'}">${isL?'점심':'저녁'}</span>
+          <span class="notice-info">가이드: ${r.guide} &nbsp;|&nbsp; ${r.menu}${r.note?` &nbsp;|&nbsp; <span style="color:#8A1A0A">${r.note}</span>`:''}</span>
+          <span class="notice-pax">${r.pax}명</span>
+        </div>`;
+      }).join('');
+      const cid = encodeURIComponent(company);
+      return `<div class="company-card">
+        <div class="company-card-header">
+          <span class="company-card-name">🏢 ${company}</span>
+          <span class="company-card-count">총 ${totalPax}명 · ${recs.length}건</span>
+        </div>
+        <div class="company-card-body">
+          ${rows}
+          <div class="company-btn-row">
+            <button class="cbtn cbtn-print" onclick="printNotice('${cid}')"><i class="ti ti-printer"></i> 인쇄</button>
+            <button class="cbtn cbtn-img" onclick="saveNoticeImage('${cid}')"><i class="ti ti-camera"></i> 이미지 저장</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  modal.style.display = 'flex';
+};
+
+function buildNoticeHTML(company, recs, dateLabel, dateKr){
+  const totalPax = recs.reduce((s,r)=>s+r.pax,0);
+  const rows = recs.sort((a,b)=>a.time.localeCompare(b.time)).map((r,i) => {
+    const isL = ['11:00','11:30','12:00','12:30','13:00','13:30'].includes(r.time);
+    return `<tr style="background:${i%2===0?'#fff':'#f8f9fa'}">
+      <td style="padding:8px 12px;border:1px solid #dee2e6;font-weight:700;font-family:monospace">${r.time}</td>
+      <td style="padding:8px 12px;border:1px solid #dee2e6;text-align:center">
+        <span style="background:${isL?'#FAECC8':'#D4E4FA'};color:${isL?'#7A4800':'#0A3070'};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">${isL?'점심 Lunch':'저녁 Dinner'}</span>
+      </td>
+      <td style="padding:8px 12px;border:1px solid #dee2e6">${r.guide}</td>
+      <td style="padding:8px 12px;border:1px solid #dee2e6">${r.menu}</td>
+      <td style="padding:8px 12px;border:1px solid #dee2e6;text-align:center;font-weight:700">${r.pax}명</td>
+    </tr>`;
+  }).join('');
+
+  return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+    <div style="background:#0A0E17;color:#fff;padding:16px 20px;border-radius:8px 8px 0 0">
+      <div style="font-size:11px;color:#8A96AA;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">MYUNGGA KOREAN RESTAURANT · 명가 한식당</div>
+      <div style="font-size:18px;font-weight:700">예약 확인서 · Reservation Notice</div>
+    </div>
+    <div style="border:1px solid #dee2e6;border-top:none;border-radius:0 0 8px 8px;overflow:hidden">
+      <div style="background:#F0F2F5;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #dee2e6">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#0A0E17">🏢 ${company}</div>
+          <div style="font-size:12px;color:#4A5570;margin-top:2px">${dateLabel} &nbsp;·&nbsp; ${dateKr}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:700;color:#0A0E17">${totalPax}<span style="font-size:12px;font-weight:400">명</span></div>
+          <div style="font-size:11px;color:#4A5570">${recs.length}건 예약</div>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;table-layout:auto">
+        <thead>
+          <tr style="background:#0A0E17;color:#fff">
+            <th style="padding:8px 12px;border:1px solid #1A2235;text-align:left;font-size:12px">시간</th>
+            <th style="padding:8px 12px;border:1px solid #1A2235;text-align:center;font-size:12px">구분</th>
+            <th style="padding:8px 12px;border:1px solid #1A2235;text-align:left;font-size:12px">가이드</th>
+            <th style="padding:8px 12px;border:1px solid #1A2235;text-align:left;font-size:12px">메뉴</th>
+            <th style="padding:8px 12px;border:1px solid #1A2235;text-align:center;font-size:12px">인원</th>
+            <th style="padding:8px 12px;border:1px solid #1A2235;text-align:left;font-size:12px">비고</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr style="background:#F0F2F5">
+            <td colspan="5" style="padding:8px 12px;border:1px solid #dee2e6;font-weight:700;text-align:right">합계 Total</td>
+            <td style="padding:8px 12px;border:1px solid #dee2e6;text-align:center;font-weight:700;font-size:15px">${totalPax}명</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div style="padding:10px 20px;font-size:11px;color:#4A5570;border-top:1px solid #dee2e6;display:flex;justify-content:space-between">
+        <span>명가 한식당 · Myungga Korean Restaurant</span>
+        <span>출력: ${new Date().toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+window.printNotice = function(cid){
+  const company = decodeURIComponent(cid);
+  const recs = reservations.filter(r => r.date===selectedDate && r.type==='tour' && r.company===company);
+  const [y,m,d] = selectedDate.split('-');
+  const dateLabel = new Date(selectedDate+'T12:00:00').toLocaleString('en',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const dateKr = y+'년 '+parseInt(m)+'월 '+parseInt(d)+'일';
+  const area = document.getElementById('notice-print-area');
+  area.innerHTML = buildNoticeHTML(company, recs, dateLabel, dateKr);
+  area.style.display = 'block';
+  document.getElementById('company-modal').style.display = 'none';
+  setTimeout(()=>{ window.print(); area.style.display='none'; area.innerHTML=''; document.getElementById('company-modal').style.display='flex'; }, 300);
+};
+
+window.saveNoticeImage = async function(cid){
+  const company = decodeURIComponent(cid);
+  const recs = reservations.filter(r => r.date===selectedDate && r.type==='tour' && r.company===company);
+  const [y,m,d] = selectedDate.split('-');
+  const dateLabel = new Date(selectedDate+'T12:00:00').toLocaleString('en',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const dateKr = y+'년 '+parseInt(m)+'월 '+parseInt(d)+'일';
+
+  // html2canvas 로드
+  if(!window.html2canvas){
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    document.head.appendChild(s);
+    await new Promise(r=>s.onload=r);
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:auto;min-width:640px;background:#fff;padding:20px;box-sizing:border-box;white-space:nowrap';
+  wrapper.innerHTML = buildNoticeHTML(company, recs, dateLabel, dateKr);
+  document.body.appendChild(wrapper);
+
+  try {
+    const canvas = await html2canvas(wrapper, {scale:2, backgroundColor:'#fff', useCORS:true});
+    const link = document.createElement('a');
+    link.download = `명가_${company}_${selectedDate}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('이미지 저장 완료! · Image saved!','#1D6A4A');
+  } catch(e){
+    showToast('이미지 저장 실패: '+e.message);
+  }
+  document.body.removeChild(wrapper);
+};
+
+// 모달 바깥 클릭시 닫기
+document.getElementById('company-modal').addEventListener('click', function(e){
+  if(e.target === this) this.style.display='none';
+});
+
+
+
+// ── Today 탭 ──
+let todayOpenSlots = {};
+
+window.renderToday = function(){
+  const today = todayStr();
+  const [y,m,d] = today.split('-');
+  const dateObj = new Date(today+'T12:00:00');
+  document.getElementById('today-title').textContent =
+    dateObj.toLocaleString('en',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  const lp = timePax(today,'lunch'), dp = timePax(today,'dinner');
+  const lpct = Math.min(100,Math.round(lp/MAX_PAX*100));
+  const dpct = Math.min(100,Math.round(dp/MAX_PAX*100));
+  const lc = lpct>=100?'#C0392B':lpct>=75?'#D4920A':'#1D9E75';
+  const dc = dpct>=100?'#C0392B':dpct>=75?'#D4920A':'#1D9E75';
+  const todayRecs = reservations.filter(r=>r.date===today);
+  const tourCnt = todayRecs.filter(r=>r.type==='tour').length;
+  const walkinCnt = todayRecs.filter(r=>r.type==='walkin').length;
+
+  document.getElementById('today-metrics').innerHTML = `
+    <div class="metric"><div class="metric-label">오늘 예약<br><span style="font-size:10px">Today Total</span></div><div class="metric-value">${todayRecs.length}</div></div>
+    <div class="metric"><div class="metric-label">점심 인원<br><span style="font-size:10px">Lunch Guests</span></div><div class="metric-value" style="color:${lc}">${lp}</div></div>
+    <div class="metric"><div class="metric-label">저녁 인원<br><span style="font-size:10px">Dinner Guests</span></div><div class="metric-value" style="color:${dc}">${dp}</div></div>
+    <div class="metric"><div class="metric-label">투어 / 워크인<br><span style="font-size:10px">Tour / Walk-in</span></div><div class="metric-value" style="font-size:18px">${tourCnt}/${walkinCnt}</div></div>`;
+
+  document.getElementById('today-lunch-fill').style.cssText = `width:${lpct}%;background:${lc}`;
+  document.getElementById('today-lunch-txt').textContent = `${lp} / 200 guests (${lpct}%)`;
+  document.getElementById('today-dinner-fill').style.cssText = `width:${dpct}%;background:${dc}`;
+  document.getElementById('today-dinner-txt').textContent = `${dp} / 200 guests (${dpct}%)`;
+
+  document.getElementById('today-slots-lunch').innerHTML  = LUNCH.map(t=>todaySlotHTML(t,'lunch',today)).join('');
+  document.getElementById('today-slots-dinner').innerHTML = DINNER.map(t=>todaySlotHTML(t,'dinner',today)).join('');
+};
+
+function todaySlotHTML(time, period, today){
+  const recs = reservations.filter(r=>r.date===today && r.time===time);
+  const pax  = recs.reduce((s,r)=>s+r.pax,0);
+  const isOpen = recs.length > 0 ? (todayOpenSlots[time] !== false) : !!todayOpenSlots[time];
+  const badgeCls = period==='lunch'?'badge-lunch':'badge-dinner';
+  const badgeTxt = period==='lunch'?'Lunch · 점심':'Dinner · 저녁';
+  let rows = '';
+  if(!recs.length){
+    rows = `<div class="empty-slot">예약 없음 · No reservations</div>`;
+  } else {
+    recs.forEach(r=>{
+      const typeBadge = r.type==='tour'
+        ? `<span class="res-type rt-tour">Tour</span>`
+        : `<span class="res-type rt-walkin">Walk-in</span>`;
+      const name  = r.type==='tour' ? r.company : r.name||'Walk-in';
+      const guide = r.type==='tour' ? r.guide : '—';
+      const menu  = r.type==='tour' ? r.menu : r.note||'—';
+      const phone = r.phone ? ` · ☎ ${r.phone}` : '';
+      rows += `<div class="res-row" style="align-items:center">
+        <div>${typeBadge}</div>
+        <div class="res-info">
+          <div class="res-name" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span>${name}</span>
+            <span style="font-size:12px;font-weight:400;color:var(--text3);display:flex;align-items:center;gap:4px"><i class="ti ti-user" style="font-size:11px"></i>${guide}</span>
+            <span style="font-size:12px;font-weight:400;color:var(--text3);display:flex;align-items:center;gap:4px"><i class="ti ti-tools-kitchen-2" style="font-size:11px"></i>${menu}</span>
+            ${phone?`<span style="font-size:12px;font-weight:400;color:var(--text3)">☎ ${r.phone}</span>`:''}
+          </div>
+        </div>
+        <span class="res-pax" style="font-size:16px">${r.pax}<span style="font-size:11px;font-weight:400">명</span></span>
+      </div>`;
+    });
+  }
+  return `<div class="time-slot">
+    <div class="ts-header" onclick="toggleTodaySlot('${time}')">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="ts-time">${time}</span>
+        <span class="badge ${badgeCls}">${badgeTxt}</span>
+        ${pax>0?`<span class="badge badge-count">${pax} pax</span>`:''}
+      </div>
+      <i class="ti ${isOpen?'ti-chevron-up':'ti-chevron-down'}" style="color:var(--text3)"></i>
+    </div>
+    <div class="slot-list${isOpen?' open':''}">${rows}</div>
+  </div>`;
+}
+
+window.toggleTodaySlot = function(t){ todayOpenSlots[t]=!todayOpenSlots[t]; renderToday(); };
+window.toggleAllToday  = function(period){
+  const times = period==='lunch'?LUNCH:DINNER;
+  const anyOpen = times.some(t=>todayOpenSlots[t]);
+  times.forEach(t=>todayOpenSlots[t]=!anyOpen);
+  renderToday();
+};
+
+// 초기화
+selectedDate=todayStr();
+showLoading(false);
+renderToday();
+</script>
+
+<!-- 회사별 통보 모달 -->
+<div id="company-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:10px;width:92%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.25)">
+    <div style="background:#0A0E17;color:#fff;padding:16px 20px;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:15px;font-weight:600">회사별 통보 · Company Notice</div>
+        <div style="font-size:11px;color:#8A96AA;margin-top:2px" id="modal-date-label"></div>
+      </div>
+      <button onclick="document.getElementById('company-modal').style.display='none'" style="background:none;border:none;color:#8A96AA;font-size:20px;cursor:pointer;line-height:1">✕</button>
+    </div>
+    <div style="padding:16px 20px">
+      <div style="font-size:12px;color:#4A5570;margin-bottom:12px">회사를 선택하면 해당 회사의 예약 내용을 인쇄하거나 이미지로 저장할 수 있습니다.</div>
+      <div id="company-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 통보 인쇄용 숨김 영역 -->
+<div id="notice-print-area" style="display:none"></div>
+
+<style>
+.company-card{border:1px solid #B0B8C8;border-radius:8px;margin-bottom:10px;overflow:hidden}
+.company-card-header{background:#F0F2F5;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.company-card-name{font-size:14px;font-weight:700;color:#0A0E17}
+.company-card-count{font-size:12px;color:#4A5570;font-family:'DM Mono',monospace}
+.company-card-body{padding:12px 16px}
+.notice-row{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #F0F2F5;font-size:13px;align-items:center}
+.notice-row:last-child{border-bottom:none}
+.notice-time{font-weight:700;font-family:'DM Mono',monospace;color:#0A0E17;min-width:48px}
+.notice-period{font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600}
+.np-lunch{background:#FAECC8;color:#7A4800}
+.np-dinner{background:#D4E4FA;color:#0A3070}
+.notice-info{flex:1;color:#2A3245}
+.notice-pax{font-weight:700;font-family:'DM Mono',monospace;color:#0A0E17;white-space:nowrap}
+.company-btn-row{display:flex;gap:8px;margin-top:10px}
+.cbtn{flex:1;padding:8px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s}
+.cbtn-print{background:#0A0E17;color:#fff}
+.cbtn-print:hover{background:#2A2420}
+.cbtn-img{background:#0D5C3A;color:#fff}
+.cbtn-img:hover{background:#155A3A}
+
+@media print{
+  body *{visibility:hidden!important}
+  #notice-print-area,#notice-print-area *{visibility:visible!important}
+  #notice-print-area{display:block!important;position:absolute;top:0;left:0;width:100%;padding:10mm 12mm;font-family:Arial,sans-serif;font-size:12px;color:#000;box-sizing:border-box;background:#fff}
+  #notice-print-area table{table-layout:auto}
+  #notice-print-area td,#notice-print-area th{white-space:nowrap}
+  @page{size:A4 portrait;margin:0}
+}
+</style>
+
+</body>
+</html>
