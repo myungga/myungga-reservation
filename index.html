@@ -795,11 +795,41 @@ window.showCompanyNotice = function(){
     companies[r.company].push(r);
   });
 
+  // Walk-in 합계 계산
+  const walkIns = reservations.filter(r => r.date === selectedDate && r.type === 'walkin');
+  const LUNCH_T = ['11:00','11:30','12:00','12:30','13:00','13:30'];
+  const wiLunch = walkIns.filter(r=>LUNCH_T.includes(r.time)).reduce((s,r)=>s+r.pax,0);
+  const wiDinner = walkIns.filter(r=>!LUNCH_T.includes(r.time)).reduce((s,r)=>s+r.pax,0);
+  const wiTotal = wiLunch + wiDinner;
+
   const list = document.getElementById('company-list');
+
+  // Walk-in 합계 박스 (Walk-in이 있을 때만 표시)
+  const wiBox = walkIns.length ? `
+    <div style="background:#F0FAF0;border:1px solid #A0C8A0;border-radius:8px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div style="font-size:13px;font-weight:700;color:#1A3A1A;display:flex;align-items:center;gap:6px"><i class="ti ti-walk"></i> Walk-in 합계 · Walk-in Summary</div>
+      <div style="display:flex;gap:16px;align-items:center;margin-left:auto;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="background:#FAECC8;color:#7A4800;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">점심 Lunch</span>
+          <span style="font-size:18px;font-weight:700;color:#0A0E17">${wiLunch}<span style="font-size:12px;font-weight:400">명</span></span>
+        </div>
+        <div style="width:1px;height:24px;background:#C0D8C0"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="background:#D4E4FA;color:#0A3070;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">저녁 Dinner</span>
+          <span style="font-size:18px;font-weight:700;color:#0A0E17">${wiDinner}<span style="font-size:12px;font-weight:400">명</span></span>
+        </div>
+        <div style="width:1px;height:24px;background:#C0D8C0"></div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:#4A5570">합계 Total</div>
+          <div style="font-size:20px;font-weight:700;color:#1A3A1A">${wiTotal}<span style="font-size:12px;font-weight:400">명</span></div>
+        </div>
+      </div>
+    </div>` : '';
+
   if(!Object.keys(companies).length){
-    list.innerHTML = '<div style="text-align:center;padding:30px;color:#4A5570;font-size:13px">해당 날짜에 투어 예약이 없습니다.</div>';
+    list.innerHTML = wiBox + '<div style="text-align:center;padding:30px;color:#4A5570;font-size:13px">해당 날짜에 투어 예약이 없습니다.</div>';
   } else {
-    list.innerHTML = Object.entries(companies).map(([company, recs]) => {
+    list.innerHTML = wiBox + Object.entries(companies).map(([company, recs]) => {
       const totalPax = recs.reduce((s,r)=>s+r.pax,0);
       const rows = recs.sort((a,b)=>a.time.localeCompare(b.time)).map(r => {
         const isL = ['11:00','11:30','12:00','12:30','13:00','13:30'].includes(r.time);
