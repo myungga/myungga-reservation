@@ -374,6 +374,7 @@ textarea{resize:vertical;min-height:56px}
             <option>Samgyeopsal BBQ · 삼겹살 바베큐</option>
             <option>Korean Set Meal · 한정식 셋트</option>
             <option>Bibimbap Set · 비빔밥 셋트</option>
+            <option>Gamjatang Set · 감자탕 셋트</option>
           </select>
         </div>
       </div>
@@ -829,10 +830,11 @@ window.showCompanyNotice = function(){
   modal.style.display = 'flex';
 };
 
-function buildNoticeHTML(company, recs, dateLabel, dateKr){
+function buildNoticeHTML(company, recs, dateLabel, dateKr, walkIns){
   const totalPax = recs.reduce((s,r)=>s+r.pax,0);
+  const LUNCH_TIMES = ['11:00','11:30','12:00','12:30','13:00','13:30'];
   const rows = recs.sort((a,b)=>a.time.localeCompare(b.time)).map((r,i) => {
-    const isL = ['11:00','11:30','12:00','12:30','13:00','13:30'].includes(r.time);
+    const isL = LUNCH_TIMES.includes(r.time);
     return `<tr style="background:${i%2===0?'#fff':'#f8f9fa'}">
       <td style="padding:8px 12px;border:1px solid #dee2e6;font-weight:700;font-family:monospace;white-space:nowrap">${r.time}</td>
       <td style="padding:8px 12px;border:1px solid #dee2e6;text-align:center;white-space:nowrap">
@@ -844,6 +846,33 @@ function buildNoticeHTML(company, recs, dateLabel, dateKr){
       <td style="padding:8px 12px;border:1px solid #dee2e6;color:#8A1A0A;white-space:nowrap">${r.note||'—'}</td>
     </tr>`;
   }).join('');
+
+  // Walk-in 합계 계산
+  const wiLunchPax = walkIns ? walkIns.filter(r=>LUNCH_TIMES.includes(r.time)).reduce((s,r)=>s+r.pax,0) : 0;
+  const wiDinnerPax = walkIns ? walkIns.filter(r=>!LUNCH_TIMES.includes(r.time)).reduce((s,r)=>s+r.pax,0) : 0;
+  const wiTotal = wiLunchPax + wiDinnerPax;
+  const walkInSection = (walkIns && walkIns.length > 0) ? `
+    <div style="margin-top:12px;border:1px solid #dee2e6;border-radius:6px;overflow:hidden">
+      <div style="background:#1A3A1A;color:#fff;padding:8px 16px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:13px;font-weight:700">Walk-in 합계 · Walk-in Summary</span>
+      </div>
+      <div style="padding:12px 16px;background:#F4FAF4;display:flex;gap:24px;align-items:center">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="background:#FAECC8;color:#7A4800;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600">점심 Lunch</span>
+          <span style="font-size:18px;font-weight:700;color:#0A0E17">${wiLunchPax}<span style="font-size:12px;font-weight:400">명</span></span>
+        </div>
+        <div style="width:1px;height:28px;background:#dee2e6"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="background:#D4E4FA;color:#0A3070;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600">저녁 Dinner</span>
+          <span style="font-size:18px;font-weight:700;color:#0A0E17">${wiDinnerPax}<span style="font-size:12px;font-weight:400">명</span></span>
+        </div>
+        <div style="width:1px;height:28px;background:#dee2e6"></div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-size:11px;color:#4A5570">Walk-in 합계</div>
+          <div style="font-size:22px;font-weight:700;color:#1A3A1A">${wiTotal}<span style="font-size:12px;font-weight:400">명</span></div>
+        </div>
+      </div>
+    </div>` : '';
 
   return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
     <div style="background:#0A0E17;color:#fff;padding:16px 20px;border-radius:8px 8px 0 0">
@@ -881,7 +910,8 @@ function buildNoticeHTML(company, recs, dateLabel, dateKr){
           </tr>
         </tfoot>
       </table>
-      <div style="padding:10px 20px;font-size:11px;color:#4A5570;border-top:1px solid #dee2e6;display:flex;justify-content:space-between">
+      ${walkInSection}
+      <div style="padding:10px 20px;font-size:11px;color:#4A5570;border-top:1px solid #dee2e6;display:flex;justify-content:space-between;margin-top:${walkIns&&walkIns.length?'12px':'0'}">
         <span>명가 한식당 · Myungga Korean Restaurant</span>
         <span>출력: ${new Date().toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
       </div>
@@ -892,11 +922,12 @@ function buildNoticeHTML(company, recs, dateLabel, dateKr){
 window.printNotice = function(cid){
   const company = decodeURIComponent(cid);
   const recs = reservations.filter(r => r.date===selectedDate && r.type==='tour' && r.company===company);
+  const walkIns = reservations.filter(r => r.date===selectedDate && r.type!=='tour');
   const [y,m,d] = selectedDate.split('-');
   const dateLabel = new Date(selectedDate+'T12:00:00').toLocaleString('en',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   const dateKr = y+'년 '+parseInt(m)+'월 '+parseInt(d)+'일';
   const area = document.getElementById('notice-print-area');
-  area.innerHTML = buildNoticeHTML(company, recs, dateLabel, dateKr);
+  area.innerHTML = buildNoticeHTML(company, recs, dateLabel, dateKr, walkIns);
   area.style.display = 'block';
   document.getElementById('company-modal').style.display = 'none';
   setTimeout(()=>{ window.print(); area.style.display='none'; area.innerHTML=''; document.getElementById('company-modal').style.display='flex'; }, 300);
@@ -905,6 +936,7 @@ window.printNotice = function(cid){
 window.saveNoticeImage = async function(cid){
   const company = decodeURIComponent(cid);
   const recs = reservations.filter(r => r.date===selectedDate && r.type==='tour' && r.company===company);
+  const walkIns = reservations.filter(r => r.date===selectedDate && r.type!=='tour');
   const [y,m,d] = selectedDate.split('-');
   const dateLabel = new Date(selectedDate+'T12:00:00').toLocaleString('en',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   const dateKr = y+'년 '+parseInt(m)+'월 '+parseInt(d)+'일';
@@ -919,7 +951,7 @@ window.saveNoticeImage = async function(cid){
 
   const wrapper = document.createElement('div');
   wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;background:#fff;padding:20px;box-sizing:border-box';
-  wrapper.innerHTML = buildNoticeHTML(company, recs, dateLabel, dateKr);
+  wrapper.innerHTML = buildNoticeHTML(company, recs, dateLabel, dateKr, walkIns);
   document.body.appendChild(wrapper);
 
   try {
