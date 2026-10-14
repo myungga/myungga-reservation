@@ -406,12 +406,22 @@ textarea{resize:vertical;min-height:56px}
         </div>
         <div class="form-field"><label>Guests <span class="lbl-kr">인원</span> *</label><input type="number" id="w-pax" placeholder="No. of guests" min="1" max="200" oninput="checkRemain()"></div>
       </div>
-      <div class="form-grid single">
+      <div class="form-grid">
+        <div class="form-field"><label>Menu Type <span class="lbl-kr">식사 종류</span></label>
+          <select id="w-menu">
+            <option value="">Select</option>
+            <option>Samgyeopsal BBQ · 삼겹살 바베큐</option>
+            <option>Korean Set Meal · 한정식 셋트</option>
+            <option>Bibimbap Set · 비빔밥 셋트</option>
+            <option>Gamjatang Set · 감자탕 셋트</option>
+            <option>현장 주문 · Order on-site</option>
+          </select>
+        </div>
         <div class="form-field"><label>Phone <span class="lbl-kr">연락처</span></label><input type="text" id="w-phone" placeholder="Phone number"></div>
       </div>
       <div class="form-grid single">
         <div class="form-field"><label>Remarks <span class="lbl-kr">비고</span></label>
-          <div class="ac-wrap"><div class="ac-row"><textarea id="w-note" placeholder="Menu, requests" rows="2" oninput="acFilter('w-note','wnote')" onfocus="acOpen('w-note','wnote')"></textarea>
+          <div class="ac-wrap"><div class="ac-row"><textarea id="w-note" placeholder="Special requests" rows="2" oninput="acFilter('w-note','wnote')" onfocus="acOpen('w-note','wnote')"></textarea>
           <button class="ac-btn" onclick="acToggle('w-note','wnote')" type="button" style="align-self:flex-start;height:38px"><i class="ti ti-chevron-down"></i></button></div>
           <div class="ac-dropdown" id="ac-w-note"></div></div>
         </div>
@@ -606,6 +616,7 @@ window.startEdit=function(id){
   } else {
     document.getElementById('w-name').value=r.name||'';
     document.getElementById('w-pax').value=r.pax||'';
+    document.getElementById('w-menu').value=r.menu||'';
     document.getElementById('w-phone').value=r.phone||'';
     document.getElementById('w-note').value=r.note||'';
   }
@@ -662,6 +673,7 @@ window.setType=function(t){
 function clearForm(){
   ['t-company','t-guide','t-pax','t-name','t-phone','t-note','w-name','w-pax','w-phone','w-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const m=document.getElementById('t-menu');if(m)m.value='';
+  const wm=document.getElementById('w-menu');if(wm)wm.value='';
   document.querySelectorAll('.ac-dropdown').forEach(d=>d.classList.remove('open'));
 }
 
@@ -689,9 +701,10 @@ window.saveReservation=async function(goBack){
     const pax=parseInt(document.getElementById('w-pax').value)||0;
     if(!pax){showToast('Please enter number of guests');return;}
     const name=document.getElementById('w-name').value.trim()||'Walk-in';
+    const menu=document.getElementById('w-menu').value;
     const note=document.getElementById('w-note').value.trim();
     if(name!=='Walk-in')acLearn('wname',name);if(note)acLearn('wnote',note);
-    Object.assign(r,{type:'walkin',pax,name,phone:document.getElementById('w-phone').value.trim(),note});
+    Object.assign(r,{type:'walkin',pax,name,menu,phone:document.getElementById('w-phone').value.trim(),note});
   }
   const period=getPeriod(selectedTime);
   const periodPax=timePax(selectedDate,period,editingId);
@@ -805,24 +818,25 @@ window.showCompanyNotice = function(){
   const list = document.getElementById('company-list');
 
   // Walk-in 합계 박스 (Walk-in이 있을 때만 표시)
+  // Walk-in 카드 (합계 + 시간별 리스트)
+  const wiRows = walkIns.length ? walkIns.sort((a,b)=>a.time.localeCompare(b.time)).map(r => {
+    const isL = LUNCH_T.includes(r.time);
+    return `<div class="notice-row">
+      <span class="notice-time">${r.time}</span>
+      <span class="notice-period ${isL?'np-lunch':'np-dinner'}">${isL?'점심':'저녁'}</span>
+      <span class="notice-info">${r.name||'Walk-in'}${r.menu?` &nbsp;|&nbsp; ${r.menu}`:''}${r.note?` &nbsp;|&nbsp; <span style="color:#8A1A0A">${r.note}</span>`:''}</span>
+      <span class="notice-pax">${r.pax}명</span>
+    </div>`;
+  }).join('') : '';
+
   const wiBox = walkIns.length ? `
-    <div style="background:#F0FAF0;border:1px solid #A0C8A0;border-radius:8px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-      <div style="font-size:13px;font-weight:700;color:#1A3A1A;display:flex;align-items:center;gap:6px"><i class="ti ti-walk"></i> Walk-in 합계 · Walk-in Summary</div>
-      <div style="display:flex;gap:16px;align-items:center;margin-left:auto;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="background:#FAECC8;color:#7A4800;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">점심 Lunch</span>
-          <span style="font-size:18px;font-weight:700;color:#0A0E17">${wiLunch}<span style="font-size:12px;font-weight:400">명</span></span>
-        </div>
-        <div style="width:1px;height:24px;background:#C0D8C0"></div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="background:#D4E4FA;color:#0A3070;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">저녁 Dinner</span>
-          <span style="font-size:18px;font-weight:700;color:#0A0E17">${wiDinner}<span style="font-size:12px;font-weight:400">명</span></span>
-        </div>
-        <div style="width:1px;height:24px;background:#C0D8C0"></div>
-        <div style="text-align:right">
-          <div style="font-size:11px;color:#4A5570">합계 Total</div>
-          <div style="font-size:20px;font-weight:700;color:#1A3A1A">${wiTotal}<span style="font-size:12px;font-weight:400">명</span></div>
-        </div>
+    <div class="company-card" style="border-left:4px solid #2A7A2A">
+      <div class="company-card-header" style="background:#F0FAF0">
+        <span class="company-card-name" style="color:#1A3A1A">🚶 Walk-in</span>
+        <span class="company-card-count">총 ${wiTotal}명 · ${walkIns.length}건 &nbsp;|&nbsp; 점심 ${wiLunch}명 &nbsp; 저녁 ${wiDinner}명</span>
+      </div>
+      <div class="company-card-body">
+        ${wiRows}
       </div>
     </div>` : '';
 
